@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>⚠️ SISTEMA COMPROMETIDO</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        body { background: #000; font-family: 'Courier New', monospace; height: 100vh; overflow: hidden; position: relative; }
+
+        .red-flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,0,0,0); pointer-events: none; z-index: 999; transition: 0.02s; }
+        .flash-active { background: rgba(255,0,0,0.85); }
+
+        .static-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: repeating-radial-gradient(circle at 20% 30%, rgba(0,0,0,0.2) 0px, rgba(255,0,0,0.1) 2px, transparent 3px); pointer-events: none; z-index: 998; animation: staticMove 0.05s infinite; }
+        @keyframes staticMove { 0% { opacity: 0.3; background-position: 0 0; } 100% { opacity: 0.6; background-position: 10px 10px; } }
+
+        .cascada { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; color: #0f0; font-size: 14px; opacity: 0.4; overflow: hidden; }
+
+        .main-container { position: relative; z-index: 20; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .shake { animation: tremor 0.03s infinite; }
+        @keyframes tremor { 0% { transform: translate(0,0); } 25% { transform: translate(3px,-2px); } 50% { transform: translate(-3px,3px); } 75% { transform: translate(2px,-3px); } 100% { transform: translate(-2px,2px); } }
+
+        .terror-card { background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); border: 3px solid #ff0000; border-radius: 40px; width: 90%; max-width: 380px; padding: 28px 20px; box-shadow: 0 0 100px rgba(255,0,0,0.6); text-align: center; animation: borderPulse 0.3s infinite alternate; }
+        @keyframes borderPulse { 0% { border-color: #ff0000; } 100% { border-color: #4a0000; } }
+
+        .skull { font-size: 70px; margin-bottom: 10px; animation: skullShake 0.15s infinite; }
+        @keyframes skullShake { 0% { transform: rotate(0deg); } 50% { transform: rotate(15deg) scale(1.2); text-shadow: 0 0 20px red; } 100% { transform: rotate(-15deg) scale(0.9); } }
+
+        h1 { color: #ff2a2a; font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+        .subtext { color: #ff7777; font-size: 11px; margin-bottom: 20px; border-bottom: 1px dashed red; display: inline-block; animation: blinkSub 0.8s infinite; }
+        @keyframes blinkSub { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        .code-block { background: #0a0a0a; border-left: 4px solid red; padding: 14px; margin: 20px 0; text-align: left; font-size: 10px; color: #fa8072; font-family: monospace; max-height: 150px; overflow-y: hidden; }
+        .code-line { margin-bottom: 6px; white-space: nowrap; overflow: hidden; animation: typeLine 0.3s; }
+        @keyframes typeLine { from { width: 0; opacity: 0; } to { width: 100%; opacity: 1; } }
+
+        .progress-container { margin: 20px 0; }
+        .progress-bar { background: #1a0000; border-radius: 20px; height: 12px; overflow: hidden; margin-bottom: 8px; }
+        .progress-fill { width: 0%; height: 100%; background: #ff3b30; animation: fillDanger 3s infinite; }
+        @keyframes fillDanger { 0% { width: 0%; } 50% { width: 100%; } 100% { width: 0%; } }
+        .progress-fill2 { width: 0%; height: 100%; background: #ff8000; animation: fillDanger2 5s infinite; }
+        @keyframes fillDanger2 { 0% { width: 10%; } 50% { width: 90%; } 100% { width: 10%; } }
+
+        .counter { font-size: 44px; font-weight: bold; color: #ff3b30; background: #000; display: inline-block; padding: 10px 25px; border-radius: 60px; border: 1px solid red; font-family: monospace; margin: 15px 0; letter-spacing: 5px; animation: counterPulse 0.5s infinite; }
+        @keyframes counterPulse { 50% { transform: scale(1.05); background: #1a0000; } }
+
+        .emergency-btn { background: #ff3b30; border: none; width: 100%; padding: 16px; border-radius: 50px; color: white; font-weight: bold; font-size: 16px; text-transform: uppercase; cursor: pointer; margin: 15px 0; animation: btnPulse 0.4s infinite; }
+        @keyframes btnPulse { 0% { transform: scale(1); } 100% { transform: scale(1.04); background: #8b0000; } }
+
+        .glitch-text { font-size: 9px; color: #6a0000; margin-top: 15px; font-family: monospace; animation: glitch 0.15s infinite; }
+        @keyframes glitch { 0% { text-shadow: -1px 0 red; } 50% { text-shadow: 1px 0 darkred; letter-spacing: 2px; } 100% { text-shadow: 0 0 3px red; letter-spacing: -1px; } }
+
+        .death-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; color: #ff3b30; font-family: monospace; text-align: center; font-size: 22px; }
+        .death-screen.active { display: flex; animation: deathFlicker 0.2s infinite; }
+        @keyframes deathFlicker { 0%,100% { opacity: 1; } 50% { opacity: 0.8; background: #0a0000; } }
+        .death-screen p { margin: 15px; font-size: 14px; color: #660000; }
+
+        .fake-toast { position: fixed; bottom: 20px; left: 10%; width: 80%; background: rgba(0,0,0,0.95); border-left: 3px solid red; padding: 10px; border-radius: 8px; color: #ff8888; font-size: 10px; z-index: 300; display: none; }
+        .fake-toast.show { display: block; animation: toastIn 0.3s; }
+        @keyframes toastIn { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="red-flash" id="redFlash"></div>
+<div class="static-overlay"></div>
+<div class="cascada" id="cascade"></div>
+<div class="fake-toast" id="fakeToast"></div>
+
+<div class="main-container" id="mainContainer">
+    <div class="terror-card" id="terrorCard">
+        <div class="skull">💀⚠️💀</div>
+        <h1 id="glitchTitle">ANDROID KERNEL PANIC</h1>
+        <div class="subtext">UNAUTHORIZED ACCESS • LEVEL 5 THREAT</div>
+
+        <div class="code-block" id="codeBlock">
+            <div class="code-line">> INYECCIÓN DE EXPLOIT DETECTADA</div>
+            <div class="code-line">> ROOTKIT ACTIVO: CVE-2025-1192</div>
+            <div class="code-line">> EXFILTRANDO DATOS A IP 185.xxx.xx</div>
+            <div class="code-line">> CÁMARA FRONTAL: TRANSMITIENDO</div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+            <div style="color:#777; font-size:9px;">CIFRANDO SISTEMA DE ARCHIVOS</div>
+            <div class="progress-bar" style="margin-top: 8px;"><div class="progress-fill2"></div></div>
+            <div style="color:#777; font-size:9px;">SUBENDO DATOS A SERVIDOR REMOTO</div>
+        </div>
+
+        <div class="counter" id="counterBox">00:15</div>
+
+        <button class="emergency-btn" id="desperateBtn">🚨 TOCAR PARA DETENER LA FILTRACIÓN 🚨</button>
+        <div class="glitch-text" id="glitchMessage">SISTEMA_FALLANDO_0x7F3A_CRÍTICO</div>
+        <div style="color:#550000; font-size:9px; margin-top:10px;">Si no actúa en 15 segundos, sus datos serán públicos</div>
+    </div>
+</div>
+
+<div class="death-screen" id="deathScreen">
+    <div style="font-size: 70px; animation: skullShake 0.2s infinite;">💀⛔💀</div>
+    <div style="font-size: 18px; margin-top: 20px;">ANDROID RECOVERY MODE</div>
+    <div style="font-size: 12px; color: #ff6666; margin: 10px;">Error irreversible: 0xDEADBEEF</div>
+    <p>Sistema operativo no encontrado<br>Particiones dañadas<br>Datos no recuperables</p>
+    <div style="font-size: 11px; margin-top: 30px; color: #333;">[ PRESSIONE VOLUMEN + POWER PARA REINICIAR ]</div>
+</div>
+
+<script>
+    let audioContext = null;
+    let alarmInterval = null;
+    let vibracionInterval = null;
+    let wakeLock = null;
+
+    window.addEventListener("beforeunload", function (e) {
+        if (alarmInterval || vibracionInterval) {
+            e.preventDefault();
+            e.returnValue = "";
+        }
+    });
+
+    async function mantenerPantallaEncendida() {
+        try { wakeLock = await navigator.wakeLock.request("screen"); } catch(err) {}
+    }
+
+    function liberarPantalla() {
+        if (wakeLock) { wakeLock.release(); wakeLock = null; }
+    }
+
+    function entrarPantallaCompleta() {
+        const docEl = document.documentElement;
+        if (docEl.requestFullscreen) docEl.requestFullscreen();
+    }
+
+    function iniciarAlarmaYVibracion() {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function tocarAlarma() {
+            if (!audioContext) return;
+            const now = audioContext.currentTime;
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            osc.type = "sawtooth";
+            osc.frequency.value = 800;
+            gain.gain.value = 0.3;
+            osc.start();
+            gain.gain.exponentialRampToValueAtTime(0.00001, now + 0.5);
+            osc.stop(now + 0.5);
+        }
+
+        tocarAlarma();
+        alarmInterval = setInterval(() => { if (audioContext) tocarAlarma(); }, 1500);
+
+        if (navigator.vibrate) {
+            function vibrarTerror() { navigator.vibrate([500, 200, 800, 300, 1000]); }
+            vibrarTerror();
+            vibracionInterval = setInterval(() => { navigator.vibrate([300, 100, 600, 200, 800]); }, 4000);
+        }
+    }
+
+    function detenerAlarmaYVibracion() {
+        if (alarmInterval) clearInterval(alarmInterval);
+        if (vibracionInterval) clearInterval(vibracionInterval);
+        if (audioContext) { audioContext.close(); audioContext = null; }
+        navigator.vibrate(0);
+        liberarPantalla();
+    }
+
+    function sonidoWindowsError() {
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const now = audioContext.currentTime;
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.type = "square";
+        osc.frequency.value = 220;
+        gain.gain.value = 0.2;
+        osc.start();
+        gain.gain.exponentialRampToValueAtTime(0.00001, now + 0.8);
+        osc.stop(now + 0.8);
+    }
+
+    // Al cargar la página, empezamos con efectos visuales (sin audio aún)
+    function iniciarEfectosVisuales() {
+        const flash = document.getElementById("redFlash");
+        setInterval(() => flash.classList.toggle("flash-active"), 90);
+
+        const cascadeDiv = document.getElementById("cascade");
+        for (let i = 0; i < 80; i++) {
+            const span = document.createElement("div");
+            span.style.position = "absolute";
+            span.style.left = Math.random() * 100 + "%";
+            span.style.top = Math.random() * 100 + "%";
+            span.style.color = ["#0f0", "#f00", "#ff6600"][Math.floor(Math.random() * 3)];
+            span.style.fontSize = Math.random() * 18 + 8 + "px";
+            span.style.whiteSpace = "nowrap";
+            span.style.opacity = Math.random() * 0.6;
+            const chars = "ABCDEF0123456789@#$%&*!";
+            let text = "";
+            for (let j = 0; j < Math.random() * 10 + 3; j++) text += chars[Math.floor(Math.random() * chars.length)];
+            span.innerText = text;
+            span.style.animation = `caida ${Math.random() * 6 + 2}s linear infinite`;
+            cascadeDiv.appendChild(span);
+        }
+        const style = document.createElement("style");
+        style.textContent = `@keyframes caida { 0% { transform: translateY(-100vh); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(100vh); opacity: 0; } }`;
+        document.head.appendChild(style);
+
+        document.getElementById("mainContainer").classList.add("shake");
+
+        const panicMessages = ["ACCESO REMOTO CONFIRMADO", "ENCRIPTANDO FOTOS... 67%", "CONTACTOS EXPUESTOS", "BACKDOOR INSTALADO", "KERNEL CORROMPIDO", "DATOS ENVIADOS A SERVIDOR EXTERNO", "CÁMARA ACTIVADA", "MICRÓFONO EN TRANSMISIÓN", "UBICACIÓN COMPARTIDA"];
+        let msgIndex = 0;
+        setInterval(() => {
+            document.getElementById("glitchMessage").innerText = panicMessages[msgIndex % panicMessages.length] + " > " + Math.random().toString(16).substring(2, 6).toUpperCase();
+            msgIndex++;
+        }, 1200);
+
+        const codeBlock = document.getElementById("codeBlock");
+        const fakeLines = ["> DESACTIVANDO ANTIVIRUS... OK", "> BYPASS SEGURIDAD EXITOSO", "> DESCARGANDO PAYLOAD FINAL", "> CONTACTANDO C&C SERVER", "> ELIMINANDO REGISTROS DE SISTEMA", "> ESCALANDO PRIVILEGIOS"];
+        let lineIdx = 0;
+        setInterval(() => {
+            const newLine = document.createElement("div");
+            newLine.className = "code-line";
+            newLine.innerText = fakeLines[lineIdx % fakeLines.length];
+            codeBlock.appendChild(newLine);
+            if (codeBlock.children.length > 12) codeBlock.removeChild(codeBlock.children[0]);
+            lineIdx++;
+        }, 1500);
+
+        const toastMessages = ["⚠️ Aplicación no autorizada detectada", "🔴 Intruso accediendo a contactos", "📸 Foto tomada en segundo plano", "📍 Ubicación enviada a IP externa"];
+        let toastIdx = 0;
+        setInterval(() => {
+            const toast = document.getElementById("fakeToast");
+            toast.innerText = "🔴 " + toastMessages[toastIdx % toastMessages.length];
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 2500);
+            toastIdx++;
+        }, 4000);
+
+        const titleElem = document.getElementById("glitchTitle");
+        const glitchTitles = ["SISTEMA CORROMPIDO", "ROOTKIT ACTIVO", "DATOS PERDIDOS", "⚠️⚠️⚠️", "KERNEL PANIC", "0xDEADBEEF"];
+        setInterval(() => {
+            titleElem.style.textShadow = `${Math.random() * 4 - 2}px ${Math.random() * 4 - 2}px red`;
+            titleElem.innerText = glitchTitles[Math.floor(Math.random() * glitchTitles.length)];
+            setTimeout(() => {
+                titleElem.innerText = "ANDROID KERNEL PANIC";
+                titleElem.style.textShadow = "none";
+            }, 300);
+        }, 300);
+    }
+
+    // Contador regresivo de 15 segundos
+    let seconds = 15;
+    const counterElement = document.getElementById("counterBox");
+    const countdown = setInterval(() => {
+        if (seconds <= 0) {
+            clearInterval(countdown);
+            // Si no tocó el botón a tiempo, igual se activa el terror final
+            document.getElementById("deathScreen").classList.add("active");
+            document.getElementById("mainContainer").classList.remove("shake");
+            document.getElementById("terrorCard").style.display = "none";
+            detenerAlarmaYVibracion();
+            sonidoWindowsError();
+        } else {
+            counterElement.innerText = `00:${seconds.toString().padStart(2, '0')}`;
+            seconds--;
+        }
+    }, 1000);
+
+    // Botón: al tocarlo, se activa audio, vibración, pantalla completa y wake lock
+    document.getElementById("desperateBtn").addEventListener("click", async () => {
+        clearInterval(countdown);
+        entrarPantallaCompleta();
+        await mantenerPantallaEncendida();
+        iniciarAlarmaYVibracion();
+        
+        // Cambiar el texto del botón para que parezca que algo empeoró
+        const btn = document.getElementById("desperateBtn");
+        btn.innerText = "⚠️ PROTOCOLO FALLIDO ⚠️";
+        btn.disabled = true;
+        btn.style.background = "#3a0000";
+        btn.style.animation = "none";
+        
+        // Agregar un mensaje de desesperación
+        const card = document.getElementById("terrorCard");
+        const nuevoMensaje = document.createElement("div");
+        nuevoMensaje.style.color = "#ff6666";
+        nuevoMensaje.style.fontSize = "12px";
+        nuevoMensaje.style.marginTop = "10px";
+        nuevoMensaje.style.fontFamily = "monospace";
+        nuevoMensaje.innerText = "> RESCATE BLOQUEADO POR EL MALWARE";
+        card.appendChild(nuevoMensaje);
+        
+        // Acelerar el contador restante
+        let restante = seconds;
+        const acelerador = setInterval(() => {
+            if (restante <= 0) {
+                clearInterval(acelerador);
+                document.getElementById("deathScreen").classList.add("active");
+                document.getElementById("mainContainer").classList.remove("shake");
+                document.getElementById("terrorCard").style.display = "none";
+                detenerAlarmaYVibracion();
+                sonidoWindowsError();
+            } else {
+                counterElement.innerText = `00:${restante.toString().padStart(2, '0')}`;
+                restante--;
+            }
+        }, 200);
+    });
+
+    // Iniciar efectos visuales al cargar (sin audio aún)
+    iniciarEfectosVisuales();
+</script>
+</body>
+</html>
